@@ -27,6 +27,21 @@
 #import "UINavigationController+KMNavigationBarTransition.h"
 #import "UINavigationController+KMNavigationBarTransition_Internal.h"
 
+@interface KMNavigationBar: UINavigationBar
+@end
+@implementation KMNavigationBar
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    UIView *backgroundView = [self valueForKey:@"_backgroundView"];
+    if (backgroundView && backgroundView.frame.size.height != 64) {
+        CGRect rect = backgroundView.frame;
+        rect.size.height = 64;
+        backgroundView.frame = rect;
+    }
+}
+@end
+
 @implementation UIViewController (KMNavigationBarTransition)
 
 + (void)load {
@@ -76,6 +91,7 @@
             self.km_prefersNavigationBarBackgroundViewHidden = YES;
         }
         [self km_resizeTransitionNavigationBarFrame];
+        [self km_resizeTransitionNavigationBarBackgroundViewFrame];
     }
     if (self.km_transitionNavigationBar) {
         [self.view bringSubviewToFront:self.km_transitionNavigationBar];
@@ -89,7 +105,15 @@
     }
     UIView *backgroundView = [self.navigationController.navigationBar valueForKey:@"_backgroundView"];
     CGRect rect = [backgroundView.superview convertRect:backgroundView.frame toView:self.view];
+    rect.origin.x = 0;
     self.km_transitionNavigationBar.frame = rect;
+}
+
+- (void)km_resizeTransitionNavigationBarBackgroundViewFrame {
+    CGRect rect = self.km_transitionNavigationBar.frame;
+    rect.origin.y = 0;
+    UIView *transitionBarBackgroundView = [self.km_transitionNavigationBar valueForKey:@"_backgroundView"];
+    transitionBarBackgroundView.frame = rect;
 }
 
 - (void)km_addTransitionNavigationBarIfNeeded {
@@ -100,7 +124,7 @@
         return;
     }
     [self km_adjustScrollViewContentOffsetIfNeeded];
-    UINavigationBar *bar = [[UINavigationBar alloc] init];
+    KMNavigationBar *bar = [[KMNavigationBar alloc] init];
     bar.barStyle = self.navigationController.navigationBar.barStyle;
     if (bar.translucent != self.navigationController.navigationBar.translucent) {
         bar.translucent = self.navigationController.navigationBar.translucent;

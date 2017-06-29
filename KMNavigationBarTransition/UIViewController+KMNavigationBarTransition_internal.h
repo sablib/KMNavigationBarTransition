@@ -29,5 +29,6 @@
 @property (nonatomic, assign) BOOL km_prefersNavigationBarBackgroundViewHidden;
 
 - (void)km_addTransitionNavigationBarIfNeeded;
+- (void)km_resizeTransitionNavigationBarFrame;
 
 @end
